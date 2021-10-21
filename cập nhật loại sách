@@ -1,0 +1,164 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using BUS;
+using DTO;
+
+
+namespace QLTV_CNTTK15B
+{
+    public partial class frmCNLoaiSach : Form
+    {
+        public frmCNLoaiSach()
+        {
+            InitializeComponent();
+        }
+        bool them;
+        public void setnull()
+        {
+            txtMls.Text = "";
+            txtTls.Text = "";
+            txtKs.Text = "";
+        }
+        public void locktext()
+        {
+            txtMls.Enabled = false;
+            txtTls.Enabled = false;
+            txtKs.Enabled = false;
+
+            bntAdd.Enabled = true;
+            bntSave.Enabled = false;
+            bntEdit.Enabled = true;
+            bntDelete.Enabled = true;
+        }
+        public void unlocktext()
+        {
+            txtMls.Enabled = true;
+            txtTls.Enabled = true;
+            txtKs.Enabled = true;
+
+            bntAdd.Enabled = false;
+            bntSave.Enabled = true;
+            bntEdit.Enabled = false;
+            bntDelete.Enabled = false;
+        }
+
+
+
+        private void frmCNLoaiSach_Load(object sender, EventArgs e)
+        {
+            DgvLoaiSach.DataSource = B_LoaiSach.LoadLoaiSach();
+            locktext();
+        }
+
+        private void bntAdd_Click(object sender, EventArgs e)
+        {
+            setnull();
+            unlocktext();
+            them = true;
+        }
+
+        private void bntOut_Click(object sender, EventArgs e)
+        {
+            DialogResult thongbao;
+            thongbao = (MessageBox.Show("bạn có muốn thoát?", "chú ý", MessageBoxButtons.YesNo, MessageBoxIcon.Warning));
+            if (thongbao == DialogResult.Yes)
+                this.Close();
+        }
+
+        private void DgvLoaiSach_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                locktext();
+                DataGridViewRow row = new DataGridViewRow();
+
+                row = DgvLoaiSach.Rows[e.RowIndex];
+                txtMls.Text = row.Cells[0].Value.ToString();
+                txtTls.Text = row.Cells[1].Value.ToString();
+                txtKs.Text = row.Cells[2].Value.ToString();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void bntEdit_Click(object sender, EventArgs e)
+        {
+            them = false;
+            txtMls.Enabled = false;
+            unlocktext();
+        }
+
+        private void bntSave_Click(object sender, EventArgs e)
+        {
+            
+            if (them == true)
+            {
+                try
+                {
+                    string MaLS = txtMls.Text.Trim();
+                    string TenLS = txtTls.Text.Trim();
+                    string KieuS = txtKs.Text;
+                    tblLoaiSach loaisach = new tblLoaiSach(MaLS, TenLS, KieuS);
+                    B_LoaiSach.InsertLoaiSach(loaisach);
+                    DgvLoaiSach.DataSource = B_LoaiSach.LoadLoaiSach();
+                    MessageBox.Show("Bạn đã thêm sách thành công");
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                
+            }
+            else
+            {
+                try
+                {
+                    string MaLS = txtMls.Text.Trim();
+                    string TenLS = txtTls.Text.Trim();
+                    string KieuS = txtKs.Text;
+                    tblLoaiSach loaisach = new tblLoaiSach(MaLS, TenLS, KieuS);
+                    B_LoaiSach.EditLoaiSach(loaisach);
+                    DgvLoaiSach.DataSource = B_LoaiSach.LoadLoaiSach();
+                    MessageBox.Show("Bạn đã sửa sách thành công");
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private void bntDelete_Click(object sender, EventArgs e)
+        {
+            DialogResult dl = MessageBox.Show("Bạn có muốn xóa không?", "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dl == DialogResult.Yes)
+            {
+                try
+                {
+                    string MaLS = txtMls.Text;
+                    B_LoaiSach.DeleteLoaiSach(MaLS);
+                    DgvLoaiSach.DataSource = B_LoaiSach.LoadLoaiSach();
+                    MessageBox.Show("Bạn đã xóa thành công");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
