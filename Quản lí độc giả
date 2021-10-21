@@ -1,0 +1,166 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using BUS;
+using DTO;
+
+namespace QLTV_CNTTK15B
+{
+    public partial class QuanLyDocGia : Form
+    {
+        public QuanLyDocGia()
+        {
+            InitializeComponent();
+        }
+        bool them;
+
+        private void QuanLyDocGia_Load(object sender, EventArgs e)
+        {
+            dgvDg.DataSource = B_DocGia.LoadDocGia();
+        }
+        private void setnull()
+        {
+            txtTdg.Text = "";
+            txtDocgia.Text = "";
+            txtDc.Text = "";
+        }
+        private void locktext()
+        {
+            txtDocgia.Enabled = false;
+            txtTdg.Enabled = false;
+            txtDc.Enabled = false;
+            rdbntNam.Enabled = false;
+            rdbntNu.Enabled = false;
+            dtpNm.Enabled = false;
+
+            bntThem.Enabled = true;
+            bntLuu.Enabled = false;
+            bntSua.Enabled = true;
+            bntXoa.Enabled = true;
+        }
+        private void unlocktext()
+        {
+            txtDocgia.Enabled = true;
+            txtTdg.Enabled = true;
+            txtDc.Enabled = true;
+            rdbntNam.Enabled = true;
+            rdbntNu.Enabled = true;
+            dtpNm.Enabled = true;
+
+            bntThem.Enabled = false;
+            bntLuu.Enabled = true;
+            bntSua.Enabled = false;
+            bntXoa.Enabled = false;
+        }
+
+        private void dgvDg_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                DataGridViewRow row = new DataGridViewRow();
+                locktext();
+                row = dgvDg.Rows[e.RowIndex];
+                txtDocgia.Text = row.Cells[0].Value.ToString();
+                txtTdg.Text = row.Cells[1].Value.ToString();
+                rdbntNam.Text = row.Cells[2].Value.ToString();
+                dtpNm.Text= row.Cells[3].Value.ToString();
+                txtDc.Text=row.Cells[4].Value.ToString();
+
+
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void bntThem_Click(object sender, EventArgs e)
+        {
+            setnull();
+            them = true;
+            unlocktext();
+        }
+
+        private void bntSua_Click(object sender, EventArgs e)
+        {
+            them = false;
+            unlocktext();
+        }
+
+        private void bntLuu_Click(object sender, EventArgs e)
+        {
+            if (them == true)
+            {
+                try
+                {
+                    string MaDG = txtDocgia.Text.Trim();
+                    string TenDG = txtTdg.Text.Trim();
+                    bool GioiT = rdbntNam.Checked;
+                    DateTime NgayM = dtpNm.Value;
+                    string DiaC = txtDc.Text;
+                    tblDocGia docgia = new tblDocGia(MaDG, TenDG,GioiT,NgayM, DiaC);
+                    B_DocGia.InsertDocGia(docgia);
+                    dgvDg.DataSource = B_DocGia.LoadDocGia();
+                    MessageBox.Show("Bạn đã tác giả thành công");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            }
+            else
+            {
+                try
+                {
+                    string MaDG = txtDocgia.Text.Trim();
+                    string TenDG = txtTdg.Text.Trim();
+                    bool GioiT = rdbntNam.Checked;
+                    DateTime NgayM = dtpNm.Value;
+                    string DiaC = txtDc.Text;
+                    tblDocGia docgia = new tblDocGia(MaDG, TenDG, GioiT, NgayM, DiaC);
+                    B_DocGia.EditDocGia(docgia);
+                    dgvDg.DataSource = B_DocGia.LoadDocGia();
+                    MessageBox.Show("Bạn đã tác giả thành công");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private void bntThoat_Click(object sender, EventArgs e)
+        {
+            DialogResult thongbao;
+            thongbao = (MessageBox.Show("bạn có muốn thoát?", "chú ý", MessageBoxButtons.YesNo, MessageBoxIcon.Warning));
+            if (thongbao == DialogResult.Yes)
+                this.Close();
+        }
+
+        private void bntXoa_Click(object sender, EventArgs e)
+        {
+            DialogResult dl = MessageBox.Show("Bạn có muốn xóa không?", "Thông báo", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (dl == DialogResult.Yes)
+            {
+                try
+                {
+                    string MaDG = txtDocgia.Text;
+                    B_DocGia.DeleteDocGia(MaDG);
+                    dgvDg.DataSource = B_DocGia.LoadDocGia();
+                    MessageBox.Show("Bạn đã xóa thành công");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+    }
+}
